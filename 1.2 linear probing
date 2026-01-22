@@ -1,93 +1,86 @@
 #include <iostream>
 using namespace std;
 
-const int SIZE = 10;
+class HashLinear {
+    int size;
+    int id[10];
+    int qty[10];
 
-int productID[SIZE];
-int stock[SIZE];
-
-// Initialize table
-void initialize() {
-    for (int i = 0; i < SIZE; i++)
-        productID[i] = -1;
-}
-
-// Hash Function
-int hashFunction(int key) {
-    return key % SIZE;
-}
-
-// Insert
-void insert(int id, int stk) {
-    int index = hashFunction(id);
-
-    while (productID[index] != -1) {
-        index = (index + 1) % SIZE;
-    }
-
-    productID[index] = id;
-    stock[index] = stk;
-    cout << "Product inserted successfully.\n";
-}
-
-// Search
-void search(int id) {
-    int index = hashFunction(id);
-    int start = index;
-
-    while (productID[index] != -1) {
-        if (productID[index] == id) {
-            cout << "Product Found. Stock = " << stock[index] << endl;
-            return;
+public:
+    HashLinear(int s) {
+        size = s;
+        for(int i = 0; i < size; i++) {
+            id[i] = -1;   // empty slot
         }
-        index = (index + 1) % SIZE;
-
-        if (index == start)
-            break;
     }
-    cout << "Product not found.\n";
-}
 
-// Display
-void display() {
-    for (int i = 0; i < SIZE; i++) {
-        if (productID[i] != -1)
-            cout << i << " -> " << productID[i] << " (" << stock[i] << ")\n";
-        else
-            cout << i << " -> EMPTY\n";
+    int hash(int key) {
+        return key % size;
     }
-}
 
-// Menu
+    void insert(int key, int q) {
+        int index = hash(key);
+
+        while(id[index] != -1) {   // collision
+            index = (index + 1) % size; // linear probing
+        }
+
+        id[index] = key;
+        qty[index] = q;
+    }
+
+    void search(int key) {
+        int index = hash(key);
+
+        while(id[index] != -1) {
+            if(id[index] == key) {
+                cout << "Found ID " << key << " with Qty " << qty[index] << endl;
+                return;
+            }
+            index = (index + 1) % size;
+        }
+
+        cout << "ID not found\n";
+    }
+
+    void display() {
+        for(int i = 0; i < size; i++) {
+            if(id[i] != -1)
+                cout << i << " -> ID: " << id[i] << ", Qty: " << qty[i] << endl;
+            else
+                cout << i << " -> Empty\n";
+        }
+    }
+};
+
 int main() {
-    initialize();
-
-    int choice, id, stk;
+    HashLinear h(5);
+    int choice, id, qty;
 
     do {
-        cout << "\n--- Linear Probing Menu ---\n";
-        cout << "1. Insert\n2. Search\n3. Display\n4. Exit\n";
-        cout << "Enter choice: ";
+        cout << "\n1.Insert\n2.Search\n3.Display\n4.Exit\n";
         cin >> choice;
 
-        switch (choice) {
+        switch(choice) {
             case 1:
-                cout << "Enter Product ID and Stock: ";
-                cin >> id >> stk;
-                insert(id, stk);
+                cout << "Enter ID: ";
+                cin >> id;
+                cout << "Enter Qty: ";
+                cin >> qty;
+                h.insert(id, qty);
                 break;
 
             case 2:
-                cout << "Enter Product ID: ";
+                cout << "Enter ID to search: ";
                 cin >> id;
-                search(id);
+                h.search(id);
                 break;
 
             case 3:
-                display();
+                h.display();
                 break;
         }
-    } while (choice != 4);
+    } while(choice != 4);
 
     return 0;
 }
