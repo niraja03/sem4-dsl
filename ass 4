@@ -1,160 +1,105 @@
-#include <iostream>
-#include <string.h>
-#include <ctype.h>
+#include<iostream>
+#include<queue>
 using namespace std;
 
-struct node
+int graph[10][10], visited[10];
+int n;
+
+// Print graph
+void printGraph()
 {
-    char data;
-    node *left;
-    node *right;
-};
-
-class stack1
-{
-    node *data[100];   // Increased stack size
-    int top;
-
-public:
-    stack1()
+    cout<<"\nAdjacency Matrix of Graph:\n";
+    for(int i=1;i<=n;i++)
     {
-        top = -1;
-    }
-
-    int empty()
-    {
-        return (top == -1);
-    }
-
-    void push(node *p)
-    {
-        if (top < 99)
-            data[++top] = p;
-    }
-
-    node *pop()
-    {
-        if (top >= 0)
-            return data[top--];
-        return NULL;
-    }
-};
-
-class tree
-{
-public:
-    node *top;
-
-    void expression(char[]);
-    void display(node *);
-    void non_rec_postorder(node *);
-    void del(node *);
-};
-
-void tree::expression(char prefix[])
-{
-    stack1 s;
-    node *t1, *t2;
-
-    int len = strlen(prefix);
-
-    for (int i = len - 1; i >= 0; i--)
-    {
-        node *newnode = new node;
-        newnode->left = NULL;
-        newnode->right = NULL;
-
-        if (isalpha(prefix[i]))   // operand
+        for(int j=1;j<=n;j++)
         {
-            newnode->data = prefix[i];
-            s.push(newnode);
+            cout<<graph[i][j]<<" ";
         }
-        else if (prefix[i] == '+' || prefix[i] == '-' ||
-                 prefix[i] == '*' || prefix[i] == '/')
+        cout<<endl;
+    }
+
+    cout<<"\nEdges of Graph:\n";
+    for(int i=1;i<=n;i++)
+    {
+        for(int j=i+1;j<=n;j++)
         {
-            t1 = s.pop();
-            t2 = s.pop();
-
-            newnode->data = prefix[i];
-            newnode->left = t1;
-            newnode->right = t2;
-
-            s.push(newnode);
+            if(graph[i][j]==1)
+                cout<<i<<" -- "<<j<<endl;
         }
     }
-
-    top = s.pop();
 }
 
-void tree::display(node *root)   // Preorder
+// BFS
+void bfs(int start)
 {
-    if (root != NULL)
+    queue<int> q;
+    cout<<"\nBFS Traversal: ";
+
+    q.push(start);
+    visited[start]=1;
+
+    while(!q.empty())
     {
-        cout << root->data;
-        display(root->left);
-        display(root->right);
+        int v=q.front();
+        q.pop();
+
+        cout<<v<<" ";
+
+        for(int i=1;i<=n;i++)
+        {
+            if(graph[v][i]==1 && visited[i]==0)
+            {
+                q.push(i);
+                visited[i]=1;
+            }
+        }
     }
 }
 
-void tree::non_rec_postorder(node *root)
+// DFS
+void dfs(int v)
 {
-    if (root == NULL)
-        return;
+    cout<<v<<" ";
+    visited[v]=1;
 
-    stack1 s1, s2;
-    node *temp;
-
-    s1.push(root);
-
-    while (!s1.empty())
+    for(int i=1;i<=n;i++)
     {
-        temp = s1.pop();
-        s2.push(temp);
-
-        if (temp->left)
-            s1.push(temp->left);
-
-        if (temp->right)
-            s1.push(temp->right);
+        if(graph[v][i]==1 && visited[i]==0)
+        {
+            dfs(i);
+        }
     }
-
-    while (!s2.empty())
-    {
-        temp = s2.pop();
-        cout << temp->data;
-    }
-}
-
-void tree::del(node *root)
-{
-    if (root == NULL)
-        return;
-
-    del(root->left);
-    del(root->right);
-
-    delete root;   // Correct deletion
 }
 
 int main()
 {
-    char expr[100];   // Increased input size
-    tree t;
+    int start;
 
-    cout << "Enter Prefix Expression : ";
-    cin >> expr;
+    cout<<"Enter number of vertices: ";
+    cin>>n;
 
-    t.expression(expr);
+    cout<<"Enter adjacency matrix:\n";
+    for(int i=1;i<=n;i++)
+    {
+        for(int j=1;j<=n;j++)
+        {
+            cin>>graph[i][j];
+        }
+    }
 
-    cout << "\nPreorder Expression : ";
-    t.display(t.top);
+    printGraph();
 
-    cout << "\nPostorder Expression : ";
-    t.non_rec_postorder(t.top);
+    cout<<"\nEnter starting vertex: ";
+    cin>>start;
 
-    t.del(t.top);
+    for(int i=1;i<=n;i++)
+        visited[i]=0;
+    bfs(start);
 
-    cout << "\nTree deleted successfully.";
+    for(int i=1;i<=n;i++)
+        visited[i]=0;
+    cout<<"\nDFS Traversal: ";
+    dfs(start);
 
     return 0;
 }
