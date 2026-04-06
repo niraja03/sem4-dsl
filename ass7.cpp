@@ -10,6 +10,7 @@ class prims {
 
 public:
     void createGraph();
+    void displayGraph();   // NEW FUNCTION
     void primsAlgo();
 };
 
@@ -32,8 +33,35 @@ void prims::createGraph() {
     for (i = 0; i < nodes; i++) {
         for (j = 0; j < nodes; j++) {
             if (graph[i][j] == 0)
-                graph[i][j] = infi;   // fill infinity where path is not present
+                graph[i][j] = infi;
         }
+    }
+}
+
+// ---------- DISPLAY GRAPH ----------
+void prims::displayGraph() {
+    cout << "\nAdjacency Matrix:\n";
+
+    for (int i = 0; i < nodes; i++) {
+        for (int j = 0; j < nodes; j++) {
+            if (graph[i][j] == infi)
+                cout << "INF ";
+            else
+                cout << graph[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << "\nGraph Representation:\n";
+
+    for (int i = 0; i < nodes; i++) {
+        cout << i << " -> ";
+        for (int j = 0; j < nodes; j++) {
+            if (graph[i][j] != infi && i != j) {
+                cout << j << "(" << graph[i][j] << ") ";
+            }
+        }
+        cout << endl;
     }
 }
 
@@ -46,7 +74,7 @@ void prims::primsAlgo() {
     for (i = 0; i < nodes; i++)
         selected[i] = 0;
 
-    selected[0] = 1;   // starting vertex
+    selected[0] = 1;
 
     while (ne < nodes - 1) {
         min = infi;
@@ -84,6 +112,8 @@ int main() {
 
     MST.createGraph();
 
-    cout << "The Edges are \n ";
+    MST.displayGraph();   // 🔥 NEW LINE
+
+    cout << "\nThe Edges are:\n";
     MST.primsAlgo();
 }
